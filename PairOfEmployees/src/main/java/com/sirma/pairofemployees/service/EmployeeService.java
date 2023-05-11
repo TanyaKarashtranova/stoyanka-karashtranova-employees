@@ -21,13 +21,32 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
-public class EmployeeService {
+public class EmployeeService
+{
     private List<Employee> employees;
-    public static final int employeeIdPossition = 0;
-    public static final int projectIdPossition = 1;
-    public static final int dateFromPossition = 2;
-    public static final int dateToPossition = 3;
+    public static final int employeeIdPosition = 0;
+    public static final int projectIdPosition = 1;
+    public static final int dateFromPosition = 2;
+    public static final int dateToPosition = 3;
     private static final String[] header = {"EmpID1", "EmpID2", "DaysWorked"};
+    private  enum DateFormat
+    {
+        ISO("yyyy-MM-dd"),
+        DMY("dd/MM/yyyy"),
+        MDY("MM/dd/yyyy");
+
+        private final String template;
+
+        DateFormat(String template)
+        {
+            this.template = template;
+        }
+
+        public String getTemplate()
+        {
+            return template;
+        }
+    }
 
     public List<Employee> loadEmployeesFromCSV(MultipartFile file)
     {
@@ -47,17 +66,20 @@ public class EmployeeService {
         return employees;
     }
 
-    private List<Employee> readCSVFile(MultipartFile file) {
+    private List<Employee> readCSVFile(MultipartFile file)
+    {
         List<Employee> employees = new ArrayList<>();
         try (Reader reader = new InputStreamReader(file.getInputStream()))
         {
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
-            for (CSVRecord csvRecord : csvParser) {
-                int empId = Integer.parseInt(csvRecord.get(employeeIdPossition));
-                int projectId = Integer.parseInt(csvRecord.get(projectIdPossition));
-                LocalDate dateFrom = parseStringToDate(csvRecord.get(dateFromPossition));
-                LocalDate dateTo = parseStringToDate(csvRecord.get(dateToPossition));
-                if (validateDate(empId, projectId)) {
+            for (CSVRecord csvRecord : csvParser)
+            {
+                int empId = Integer.parseInt(csvRecord.get(employeeIdPosition));
+                int projectId = Integer.parseInt(csvRecord.get(projectIdPosition));
+                LocalDate dateFrom = parseStringToDate(csvRecord.get(dateFromPosition));
+                LocalDate dateTo = parseStringToDate(csvRecord.get(dateToPosition));
+                if (validateDate(empId, projectId))
+                {
                     Employee employee = new Employee(empId, projectId, dateFrom, (dateTo));
                     employees.add(employee);
                 }
@@ -66,35 +88,50 @@ public class EmployeeService {
                     throw new BadRequestException("Not appropriate date!");
                 }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new BadRequestException("Not appropriate date!" + e.getMessage());
         }
         return employees;
     }
 
-    private boolean validateDate(int employeeId, int projectId) {
-        if (employeeId < 0 || projectId < 0) {
+    private boolean validateDate(int employeeId, int projectId)
+    {
+        if (employeeId < 0 || projectId < 0)
+        {
             return false;
         }
         return true;
     }
 
-    private LocalDate parseStringToDate(String date)
+    private LocalDate parseStringToDate(String inputDate)
     {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate dateTime;
-        try
+        LocalDate date = null;
+        for (DateFormat dateFormat : DateFormat.values())
         {
-            if (!(date.equalsIgnoreCase("null"))) {
-                dateTime = LocalDate.parse(date, formatter);
-            } else {
-                dateTime = LocalDate.parse(LocalDateTime.now().format(formatter));
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat.getTemplate());
+                if (!(inputDate.equalsIgnoreCase("null")))
+                {
+                    date = LocalDate.parse(inputDate, formatter);
+                }
+                else
+                {
+                    date = LocalDate.parse(LocalDateTime.now().format(formatter));
+                }
+                return date;
             }
-    } catch (DateTimeParseException e) {
-        e.printStackTrace();
-        throw new BadRequestException("Invalid date format: " + date);
-    }
-        return dateTime;
+            catch (DateTimeParseException e)
+            {
+                continue;
+            }
+        }
+        if (date == null)
+        {
+            throw new BadRequestException("Invalid date format: " + inputDate);
+        }
+        return date;
     }
 
     public PairDTO findLongestWorkingPair(List<Employee> employees)
