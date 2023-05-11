@@ -48,6 +48,7 @@ public class EmployeeService
         }
     }
 
+    //        TODO - refactor exception handling
     public List<Employee> loadEmployeesFromCSV(MultipartFile file)
     {
         List<Employee> employees;
@@ -140,6 +141,7 @@ public class EmployeeService
         return findMaximumDaysFromAllPairs(pairToDaysWorked);
     }
 
+//TODO - optimisation algorithm
     private Map<Pair, Long> findAllPairs(List<Employee> employees)
     {
         Map<Pair, Long> pairToDaysWorked = new HashMap<>();
