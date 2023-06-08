@@ -11,14 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-public class EmployeeController
-{
+public class EmployeeController extends AbstractController {
     @Autowired
     private EmployeeService employeeService;
 
     @PutMapping("/upload")
-    public PairDTO uploadCSVFile(@RequestParam("file") MultipartFile file)
-    {
+    public PairDTO uploadCSVFile(@RequestParam("file") MultipartFile file) {
         return employeeService.findLongestWorkingPair(employeeService.loadEmployeesFromCSV(file));
     }
 }

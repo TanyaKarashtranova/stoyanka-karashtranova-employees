@@ -9,24 +9,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDateTime;
 
-public abstract class AbstractController
-{
+public abstract class AbstractController {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public ErrorDTO handlerNotFound(Exception e)
-    {
+    public ErrorDTO handlerNotFound(Exception e) {
         return buildErrorInfo(e, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    public ErrorDTO handlerBadRequest(Exception e)
-    {
+    public ErrorDTO handlerBadRequest(Exception e) {
         return buildErrorInfo(e, HttpStatus.BAD_REQUEST);
     }
 
-    private ErrorDTO buildErrorInfo(Exception e, HttpStatus status)
-    {
+    private ErrorDTO buildErrorInfo(Exception e, HttpStatus status) {
         e.printStackTrace();
         ErrorDTO dto = new ErrorDTO();
         dto.setStatus(status.value());

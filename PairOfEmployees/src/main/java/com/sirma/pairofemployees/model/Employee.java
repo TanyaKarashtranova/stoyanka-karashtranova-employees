@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
-public class Employee
-{
+public class Employee {
     private int employeeID;
     private int projectId;
     private LocalDate dateFrom;
