@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PairDTO
-{
+public class PairDTO {
     private int employeeId1;
     private int employeeId2;
     private long daysWorked;
